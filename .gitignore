@@ -1,4 +1,4 @@
-*.log
+x*.log
 .DS_Store
 .env
 .env.backup
@@ -24,11 +24,11 @@ Homestead.yaml
 Thumbs.db
 
 # Abaikan File Laporan & Dokumentasi KP
-*.docx
-*.html
-*.md
-*.txt
-*.bat
+Laporan*.docx
+Laporan*.md
+Laporan*.pdf
+!README.md
+!UPDATE_GITHUB.bat
 
 # Abaikan file dan folder AI Agent (Gemini/Cursor)
 .gemini/
