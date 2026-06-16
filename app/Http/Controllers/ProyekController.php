@@ -55,6 +55,10 @@ class ProyekController extends Controller
             'nama_proyek' => 'required|string|max:255',
             'klien_id' => 'required|exists:tb_klien,id',
             'site_manager_id' => 'required|exists:users,id',
+        ], [
+            'nama_proyek.required' => 'Judul / Nama Proyek wajib diisi!',
+            'klien_id.required' => 'Anda harus memilih Klien!',
+            'site_manager_id.required' => 'Anda harus menugaskan Site Manager!',
         ]);
 
         Proyek::create([
@@ -134,6 +138,10 @@ class ProyekController extends Controller
         
         $request->validate([
             'file_excel' => 'required|file|mimes:xlsx,xls|max:5120',
+        ], [
+            'file_excel.required' => 'Wajib memilih file Excel untuk di-upload!',
+            'file_excel.mimes' => 'Format file salah! Harus berupa file Excel (.xlsx atau .xls).',
+            'file_excel.max' => 'Ukuran file terlalu besar! Maksimal 5 MB.',
         ]);
 
         $proyek = Proyek::findOrFail($proyek_id);
@@ -626,6 +634,11 @@ class ProyekController extends Controller
             'subjek' => 'required|string|max:255',
             'deskripsi_perubahan' => 'required|string',
             'lampiran' => 'nullable|image|mimes:jpg,jpeg,png|max:5120'
+        ], [
+            'subjek.required' => 'Subjek CCO wajib diisi!',
+            'deskripsi_perubahan.required' => 'Deskripsi perubahan tidak boleh kosong!',
+            'lampiran.image' => 'Lampiran harus berupa gambar (JPG, JPEG, PNG).',
+            'lampiran.max' => 'Ukuran gambar maksimal 5 MB.',
         ]);
 
         $proyek = Proyek::findOrFail($id);

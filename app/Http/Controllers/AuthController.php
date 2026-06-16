@@ -22,13 +22,21 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        $user = \App\Models\User::where('username', $request->username)->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'username' => 'Akun dengan Username tersebut belum terdaftar di sistem.',
+            ])->onlyInput('username');
+        }
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('dashboard');
         }
 
         return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
+            'password' => 'Password yang Anda masukkan salah. Silakan coba lagi.',
         ])->onlyInput('username');
     }
 

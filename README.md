@@ -1,7 +1,7 @@
 # SIM BOQ Enterprise
 ## Sistem Informasi Administrasi Proyek Infrastruktur IT (RAB, BOQ, CCO, BAST, dan Pemeliharaan) Berbasis Web
 
-**Versi:** 2.0 (Enterprise Edition)  
+**Versi:** 1.0 (Enterprise Edition)  
 **Framework:** Laravel 11  
 **Oleh:** Muhammad Usman — 411231141  
 **Universitas:** Universitas Dian Nusantara — Prodi Teknik Informatika  
@@ -53,7 +53,7 @@ Buka di Browser: **http://127.0.0.1:8000** 🎉
 
 ---
 
-## 📂 Fitur Utama per Role (Pembaruan v2.0)
+## 📂 Fitur Utama per Role 
 
 ### 👤 Admin (Super User)
 - **Dashboard Analitik:** Grafik proyek, metrik keuangan, & daftar CCO/Tiket aktif.
