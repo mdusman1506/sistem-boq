@@ -22,3 +22,14 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Abaikan File Laporan & Dokumentasi KP
+*.docx
+*.html
+*.md
+*.txt
+*.bat
+
+# Abaikan file dan folder AI Agent (Gemini/Cursor)
+.gemini/
+.cursor/

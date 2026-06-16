@@ -39,7 +39,6 @@ class ChangeRequestController extends Controller
                     'nomor_surat' => $latestBoq->nomor_surat,
                     'versi_revisi' => 'Rev ' . $countRevisi,
                     'status_approval' => 'Draft',
-                    'keterangan_revisi' => 'Revisi CCO: ' . $cco->subjek,
                     'is_client_approved' => false,
                 ]);
 

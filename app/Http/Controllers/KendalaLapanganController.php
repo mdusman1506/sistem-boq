@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\KendalaLapangan;
+use App\Models\Proyek;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,6 +17,11 @@ class KendalaLapanganController extends Controller
             'deskripsi' => 'required|string',
             'foto_kendala' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+
+        $proyek = Proyek::findOrFail($request->proyek_id);
+        if ($proyek->site_manager_id !== Auth::id()) {
+            abort(403, 'Anda hanya dapat melaporkan kendala untuk proyek yang Anda kelola.');
+        }
 
         $fotoPath = null;
         if ($request->hasFile('foto_kendala')) {

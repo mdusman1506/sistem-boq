@@ -20,6 +20,10 @@ class SiteManagerController extends Controller
         // Ambil BOQ beserta relasinya, tidak perlu fetch relasi yang menampilkan detail harga yang tidak perlu
         $boq = BoqHeader::with(['proyek.klien', 'boqDetails.barangJasa'])->findOrFail($id);
 
+        if ($boq->proyek->site_manager_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Anda bukan Site Manager untuk proyek ini.');
+        }
+
         if ($boq->status_approval !== 'Pending') {
             return redirect()->route('dashboard')->with('error', 'Dokumen ini tidak dalam status Pending/Menunggu Verifikasi.');
         }
@@ -33,7 +37,11 @@ class SiteManagerController extends Controller
             return redirect()->route('dashboard')->with('error', 'Akses ditolak.');
         }
 
-        $boq = BoqHeader::findOrFail($id);
+        $boq = BoqHeader::with('proyek')->findOrFail($id);
+
+        if ($boq->proyek->site_manager_id !== Auth::id()) {
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak. Anda bukan Site Manager untuk proyek ini.');
+        }
         
         if ($boq->status_approval !== 'Pending') {
             return redirect()->route('dashboard')->with('error', 'Dokumen tidak dalam status valid untuk diverifikasi.');

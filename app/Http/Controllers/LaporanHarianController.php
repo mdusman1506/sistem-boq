@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LaporanHarian;
+use App\Models\Proyek;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,6 +18,11 @@ class LaporanHarianController extends Controller
             'jumlah_pekerja' => 'required|integer|min:1',
             'kegiatan' => 'required|string',
         ]);
+
+        $proyek = Proyek::findOrFail($request->proyek_id);
+        if ($proyek->site_manager_id !== Auth::id()) {
+            abort(403, 'Anda hanya dapat mengisi laporan harian untuk proyek yang Anda kelola.');
+        }
 
         LaporanHarian::create([
             'proyek_id' => $request->proyek_id,

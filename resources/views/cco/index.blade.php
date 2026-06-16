@@ -31,6 +31,14 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 bg-danger bg-opacity-10 text-danger shadow-sm mb-4">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5 align-middle"></i> 
+            <span class="align-middle fw-medium">{{ session('error') }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="table-container">
         <table class="table table-hover align-middle custom-table" id="ccoTable">
             <thead class="bg-light">
@@ -71,7 +79,7 @@
                             <i class="bi bi-eye"></i>
                         </a>
                         
-                        @if($cco->status === 'Pending')
+                        @if($cco->status === 'Pending' && Auth::user()->role === 'Admin')
                         <form action="{{ route('cco.process', $cco->id) }}" method="POST" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-primary rounded-pill" onclick="return confirm('Proses CCO ini? Sistem akan membuat salinan BOQ baru (Revisi) untuk Anda edit.')">

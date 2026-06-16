@@ -60,15 +60,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/export-global', [DashboardController::class, 'exportGlobal'])->name('dashboard.export-global');
     Route::get('/dashboard/export-eksekutif-pdf', [DashboardController::class, 'exportEksekutifPdf'])->name('dashboard.export-eksekutif');
     
-    // Notifications
-    Route::get('/notifications/read/{id}', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-
-    // Audit Trail (Admin & Direktur)
-    Route::middleware(['role:Admin,Direktur'])->group(function () {
-        Route::get('/activity-log', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity_log.index');
-    });
-
     // Settings (Admin & Direktur)
     Route::middleware(['role:Admin,Direktur'])->group(function () {
         Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
@@ -111,7 +102,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Proyek (General Access depending on internal logic)
-    Route::resource('proyek', ProyekController::class)->except(['destroy']);
+    Route::resource('proyek', ProyekController::class)->except(['destroy', 'edit', 'update']);
     Route::get('/boq/{id}/export-pdf', [ProyekController::class, 'exportPdf'])->name('boq.export-pdf');
     
     // Site Manager Actions
@@ -143,4 +134,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/unread', [App\Http\Controllers\NotificationController::class, 'getUnread'])->name('notifications.unread');
     Route::get('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 });

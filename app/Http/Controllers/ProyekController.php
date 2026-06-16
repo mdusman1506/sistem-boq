@@ -322,30 +322,35 @@ class ProyekController extends Controller
             'description' => 'Meneruskan BOQ ' . $boqHeader->nomor_surat . ' ke lapangan untuk diverifikasi.'
         ]);
 
-        $siteManagers = \App\Models\User::where('role', 'Site Manager')->get();
-        foreach ($siteManagers as $sm) {
-            \App\Models\Notification::create([
-                'user_id' => $sm->id,
-                'title' => 'Verifikasi BOQ Baru',
-                'message' => 'Admin meminta Anda memverifikasi BOQ Proyek ' . $boqHeader->proyek->nama_proyek,
-                'link' => route('dashboard')
-            ]);
+        $boqHeader->load('proyek.siteManager');
+        $assignedSm = $boqHeader->proyek->siteManager;
 
-            // Kirim email jika alamat email tersedia
-            if ($sm->email) {
-                try {
-                    \Illuminate\Support\Facades\Mail::to($sm->email)->send(
-                        new \App\Mail\BoqNotificationMail(
-                            'Tugas Verifikasi BOQ Baru — ' . $boqHeader->proyek->nama_proyek,
-                            'Admin telah mengirimkan dokumen BOQ yang membutuhkan verifikasi lapangan Anda. Silakan login ke sistem dan periksa rincian item pekerjaan proyek tersebut.',
-                            $boqHeader->proyek->nama_proyek,
-                            $sm->nama_lengkap,
-                            route('dashboard')
-                        )
-                    );
-                } catch (\Exception $e) {
-                    // Lanjutkan tanpa error jika email gagal
-                }
+        if (!$assignedSm) {
+            return back()->with('error', 'Proyek belum memiliki Site Manager yang ditugaskan.');
+        }
+
+        $verifyLink = route('sitemanager.verify', $boqHeader->id);
+
+        \App\Models\Notification::create([
+            'user_id' => $assignedSm->id,
+            'title' => 'Verifikasi BOQ Baru',
+            'message' => 'Admin meminta Anda memverifikasi BOQ Proyek ' . $boqHeader->proyek->nama_proyek,
+            'link' => $verifyLink,
+        ]);
+
+        if ($assignedSm->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($assignedSm->email)->send(
+                    new \App\Mail\BoqNotificationMail(
+                        'Tugas Verifikasi BOQ Baru — ' . $boqHeader->proyek->nama_proyek,
+                        'Admin telah mengirimkan dokumen BOQ yang membutuhkan verifikasi lapangan Anda. Silakan login ke sistem dan periksa rincian item pekerjaan proyek tersebut.',
+                        $boqHeader->proyek->nama_proyek,
+                        $assignedSm->nama_lengkap,
+                        $verifyLink
+                    )
+                );
+            } catch (\Exception $e) {
+                // Lanjutkan tanpa error jika email gagal
             }
         }
 
@@ -386,6 +391,10 @@ class ProyekController extends Controller
 
         if (!$latestBoq || $latestBoq->status_approval !== 'Approved') {
             return back()->with('error', 'Proyek tidak bisa ditutup karena BOQ belum disetujui (Approved).');
+        }
+
+        if (!$latestBoq->is_client_approved) {
+            return back()->with('error', 'Proyek tidak bisa ditutup sebelum Klien menyetujui BAST secara digital.');
         }
 
         $proyek->update(['status_proyek' => 'Selesai']);
@@ -521,8 +530,8 @@ class ProyekController extends Controller
         BoqDetail::create([
             'boq_header_id' => $header->id,
             'barang_jasa_id' => $barang->id,
-            'harga_material_satuan' => $barang->harga_dasar_material,
-            'harga_jasa_satuan' => $barang->harga_dasar_jasa,
+            'harga_material_satuan' => $barang->harga_material,
+            'harga_jasa_satuan' => $barang->harga_jasa,
             'qty_kontrak' => $request->qty_kontrak,
             'lokasi_lantai' => $request->lokasi_lantai,
             'lokasi_zona' => $request->lokasi_zona,
@@ -620,6 +629,10 @@ class ProyekController extends Controller
         ]);
 
         $proyek = Proyek::findOrFail($id);
+
+        if ($proyek->klien_id !== Auth::user()->klien_id) {
+            abort(403, 'Anda tidak memiliki akses ke proyek ini.');
+        }
         
         $lampiranPath = null;
         if ($request->hasFile('lampiran')) {
@@ -656,6 +669,14 @@ class ProyekController extends Controller
         ]);
 
         $proyek = Proyek::findOrFail($id);
+
+        if ($proyek->klien_id !== Auth::user()->klien_id) {
+            abort(403, 'Anda tidak memiliki akses ke proyek ini.');
+        }
+
+        if ($proyek->status_proyek !== 'Selesai') {
+            return back()->with('error', 'Tiket pemeliharaan hanya dapat diajukan untuk proyek yang sudah Selesai.');
+        }
         
         $lampiranPath = null;
         if ($request->hasFile('foto_kerusakan')) {
