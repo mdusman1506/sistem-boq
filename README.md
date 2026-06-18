@@ -21,31 +21,82 @@
 
 ## 🚀 Cara Menjalankan Sistem (Langkah demi Langkah)
 
-### Prasyarat
-Pastikan software berikut sudah terinstal di laptop Anda:
-- **XAMPP** (versi 8.2 ke atas)
-- **Composer**
+Proyek ini dapat dijalankan dengan dua cara: **Cara Manual (menggunakan XAMPP)** atau **Cara Otomatis (menggunakan Docker)**.
 
-### Langkah 1: Nyalakan XAMPP
+### Opsi A: Cara Menjalankan via Docker (Sangat Mudah & Disarankan)
+
+Jika Anda sudah menginstal **Docker Desktop**, Anda dapat menjalankan sistem ini tanpa perlu mengkonfigurasi web server, PHP, atau database secara manual.
+
+1. Buka Terminal atau Command Prompt, *clone* repositori ini:
+   ```bash
+   git clone https://github.com/mdusman1506/sistem-boq.git
+   cd sistem-boq
+   ```
+2. Salin file `.env.example` menjadi `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   *(Untuk pengguna Windows CMD: `copy .env.example .env`)*
+3. Jalankan Docker Compose:
+   ```bash
+   docker-compose up -d --build
+   ```
+4. Install dependensi dan jalankan migrasi database di dalam *container*:
+   ```bash
+   docker-compose exec app composer install
+   docker-compose exec app php artisan key:generate
+   docker-compose exec app php artisan migrate:fresh --seed
+   ```
+5. Buka browser: **http://localhost:8000** 🎉
+
+---
+
+### Opsi B: Cara Menjalankan Manual via XAMPP
+
+Jika Anda belum memiliki Docker, pastikan software berikut sudah terinstal:
+- **XAMPP** (dengan PHP versi 8.2 ke atas)
+- **Composer** (https://getcomposer.org/)
+- **Git** (https://git-scm.com/)
+
+#### Langkah 1: Clone Repositori (Unduh Kode)
+1. Buka **Terminal** atau **Git Bash** di folder `C:\xampp\htdocs\`
+2. Jalankan perintah:
+   ```bash
+   git clone https://github.com/mdusman1506/sistem-boq.git
+   cd sistem-boq
+   ```
+
+#### Langkah 2: Nyalakan Database
 1. Buka **XAMPP Control Panel**.
 2. Klik **Start** pada modul **Apache** dan **MySQL**.
+3. Buka browser, akses: `http://localhost/phpmyadmin`
+4. Buat database baru dengan nama: `db_sistem_boq` lalu **Create**.
 
-### Langkah 2: Buat Database
-1. Buka browser, akses: `http://localhost/phpmyadmin`
-2. Ketik nama database: `db_sistem_boq` lalu **Create**.
-
-### Langkah 3: Buka Terminal & Install
-1. Masuk ke folder proyek: `cd C:\xampp\htdocs\sistemboq`
-2. Install dependensi (hanya jika folder `vendor` belum ada): `composer install`
-
-### Langkah 4: Setup Environment & Database
-Salin `.env.example` ke `.env`, sesuaikan nama database, lalu jalankan:
+#### Langkah 3: Install Dependensi Laravel
+Di dalam terminal yang berada di folder `sistem-boq`, jalankan:
 ```bash
-php artisan migrate:fresh --seed
+composer install
 ```
-> **⚠️ PERINGATAN:** Perintah ini akan MENGHAPUS semua data lama dan mereset sistem dengan data awal (*Seeder*).
+*(Proses ini membutuhkan koneksi internet dan memastikan semua pustaka yang diperlukan Laravel terunduh, jika gagal pastikan ekstensi PHP ZIP dan cURL aktif)*
 
-### Langkah 5: Jalankan Server Laravel
+#### Langkah 4: Setup Environment & Database
+1. Salin `.env.example` ke `.env`:
+   ```bash
+   copy .env.example .env
+   ```
+2. Hasilkan *application key*:
+   ```bash
+   php artisan key:generate
+   ```
+3. Sesuaikan koneksi database di file `.env` jika diperlukan (Secara default `DB_DATABASE=db_sistem_boq`).
+4. Jalankan perintah migrasi dan pengisian data otomatis:
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+   > **⚠️ PERINGATAN:** Perintah ini akan MENGHAPUS semua data lama di dalam `db_sistem_boq` dan mereset sistem dengan data awal (*Seeder*).
+
+#### Langkah 5: Jalankan Server Laravel
+Masih di terminal yang sama, ketik:
 ```bash
 php artisan serve
 ```
@@ -96,7 +147,7 @@ Sistem ini dibangun dengan standar **Enterprise-Grade**:
 ---
 
 ## 📋 Checklist Sidang / Demo
-- [ ] XAMPP Start & `php artisan serve` jalan.
+- [ ] XAMPP / Docker Start & Server Laravel jalan.
 - [ ] Login multi-role berhasil diuji (Klien ajukan CCO -> Admin Proses -> SM Verifikasi).
 - [ ] *Dark Mode* berfungsi halus.
 - [ ] Fitur tiket pemeliharaan berjalan lancar (unggah & tampil foto).

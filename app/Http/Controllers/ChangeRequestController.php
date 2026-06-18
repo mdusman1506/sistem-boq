@@ -30,19 +30,18 @@ class ChangeRequestController extends Controller
             
             // Duplikasi BOQ terakhir ke versi revisi baru
             $latestBoq = BoqHeader::where('proyek_id', $cco->proyek_id)->latest()->first();
+            $countRevisi = BoqHeader::where('proyek_id', $cco->proyek_id)->count();
             
-            if ($latestBoq) {
-                $countRevisi = BoqHeader::where('proyek_id', $cco->proyek_id)->count();
-                
-                $newBoq = BoqHeader::create([
-                    'proyek_id' => $cco->proyek_id,
-                    'nomor_surat' => $latestBoq->nomor_surat,
-                    'versi_revisi' => 'Rev ' . $countRevisi,
-                    'status_approval' => 'Draft',
-                    'is_client_approved' => false,
-                ]);
+            $newBoq = BoqHeader::create([
+                'proyek_id' => $cco->proyek_id,
+                'nomor_surat' => $latestBoq ? $latestBoq->nomor_surat : 'SURAT-CCO-' . time(),
+                'versi_revisi' => 'Rev ' . $countRevisi,
+                'status_approval' => 'Draft',
+                'is_client_approved' => false,
+            ]);
 
-                // Duplikasi detail BOQ
+            if ($latestBoq) {
+                // Duplikasi detail BOQ jika ada
                 foreach ($latestBoq->boqDetails as $detail) {
                     BoqDetail::create([
                         'boq_header_id' => $newBoq->id,
